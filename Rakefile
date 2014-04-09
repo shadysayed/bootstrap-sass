@@ -22,6 +22,23 @@ task :convert, :branch do |t, args|
   Converter.new(branch: args[:branch]).process_bootstrap
 end
 
+desc 'Converts a directory from less to sass'
+task :convert_dir, :path do |t, args|
+  require './tasks/converter'
+  c = Converter.new
+  Dir["#{args[:path]}/*.less"].each do |file_path|
+    puts "Processing #{file_path}"
+    content = File.open file_path, 'rb' do |file|
+      file.read
+    end
+    output = c.convert_less content
+    
+    File.open(file_path.gsub(".less", ".scss"), 'w') do |f|
+      f.write output
+    end
+  end
+end
+
 desc 'LESS to stdin -> Sass to stdout'
 task :less_to_scss, :branch do |t, args|
   require './tasks/converter'
